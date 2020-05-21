@@ -1,14 +1,17 @@
 package com.utkarshr.popup_toast
 
+import android.animation.Animator
+import android.animation.ObjectAnimator
 import android.content.Context
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.WindowManager
-import android.widget.*
+import android.view.animation.OvershootInterpolator
+import android.widget.Button
+import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 
@@ -17,37 +20,22 @@ class MainActivity : AppCompatActivity() {
 
     var mView: View? = null
 
-    var create: Boolean = false
+    var mRootViewGroup: ViewGroup? = null
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        mRootViewGroup = window.decorView.rootView.findViewById(android.R.id.content) as ViewGroup
 
         findViewById<Button>(R.id.createView).setOnClickListener {
-
-
-            if (create) {
-//                val animation2: ObjectAnimator = ObjectAnimator.ofFloat(mView, "translationY", 2020F, 1000F)
-//                animation2.duration = 1000
-//                animation2.target = mView
-//                animation2.start()
-            } else {
-                createView(this)
-//                val animation2: ObjectAnimator = ObjectAnimator.ofFloat(mView, "translationY", 1000F, 2020F)
-//                animation2.duration = 1000
-//                animation2.target = mView
-//                animation2.start()
-            }
-            create = !create
+            createView(this)
         }
 
         findViewById<Button>(R.id.removeView).setOnClickListener {
             removeView()
         }
-
-
     }
 
     private fun createView(context: Context) {
@@ -60,17 +48,6 @@ class MainActivity : AppCompatActivity() {
         //setting some initial position
         mView?.x = Utils.dpToPx(200).toFloat()
         mView?.y = Utils.dpToPx(200).toFloat()
-
-        //can be later used to adjust margins if needed
-        mView?.addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
-            override fun onViewAttachedToWindow(v: View?) {
-
-            }
-
-            override fun onViewDetachedFromWindow(v: View?) {
-
-            }
-        })
 
         val listener = object: View.OnLayoutChangeListener {
             override fun onLayoutChange(
@@ -88,9 +65,16 @@ class MainActivity : AppCompatActivity() {
                 val viewWidth = view.width
                 val viewHeight = view.height
                 val newX = (Utils.screenWidth - viewWidth)/2
-                val newY = Utils.screenHeight - viewHeight - Utils.dpToPx(16)
+                val startY = mRootViewGroup!!.height
+                val finalY = mRootViewGroup!!.height - viewHeight - Utils.dpToPx(24)
                 view.x = newX.toFloat()
-                view.y = newY.toFloat()
+                view.y = startY.toFloat()
+
+                val anim = ObjectAnimator.ofFloat(view, "translationY", finalY.toFloat())
+                anim.duration = 300
+                anim.interpolator = OvershootInterpolator(2f)
+                anim.start()
+
                 view.removeOnLayoutChangeListener(this)
             }
 
@@ -98,13 +82,28 @@ class MainActivity : AppCompatActivity() {
         mView?.addOnLayoutChangeListener(listener)
 
         mView?.visibility = View.INVISIBLE
-        (window.decorView.rootView as ViewGroup).addView(mView, LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT))
+        mRootViewGroup?.addView(mView, LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT))
     }
 
     private fun removeView() {
         mView?.let {
-            (window.decorView.rootView as ViewGroup).removeView(it)
-            mView = null
+            val finalY = mRootViewGroup!!.height
+            val anim = ObjectAnimator.ofFloat(it, "translationY", finalY.toFloat())
+            anim.duration = 300
+            anim.interpolator = OvershootInterpolator(2f)
+            anim.start()
+            anim.addListener(object : Animator.AnimatorListener {
+                override fun onAnimationRepeat(p0: Animator?) {
+                }
+                override fun onAnimationEnd(p0: Animator?) {
+                    mRootViewGroup?.removeView(it)
+                    mView = null
+                }
+                override fun onAnimationCancel(p0: Animator?) {
+                }
+                override fun onAnimationStart(p0: Animator?) {
+                }
+            })
         }
     }
 
