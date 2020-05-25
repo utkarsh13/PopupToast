@@ -2,8 +2,8 @@ package com.utkarshr.popup_toast
 
 import android.animation.Animator
 import android.animation.ObjectAnimator
+import android.annotation.SuppressLint
 import android.content.Context
-import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.MotionEvent
@@ -14,7 +14,6 @@ import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import com.utkarshr.popup_toast.Utils.Companion.dpToPx
 import com.utkarshr.popup_toast.Utils.Companion.ifLet
@@ -30,7 +29,6 @@ class MainActivity : AppCompatActivity(), View.OnLayoutChangeListener, View.OnTo
     private var mViewY = 0f
     private var mYDelta = 0f
 
-    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -141,24 +139,25 @@ class MainActivity : AppCompatActivity(), View.OnLayoutChangeListener, View.OnTo
         view.removeOnLayoutChangeListener(this)
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onTouch(view: View?, event: MotionEvent?): Boolean {
         ifLet(view, event, mRootViewGroup) {
+            val touchY = event!!.rawY
+            val currentViewY = view!!.y
 
-            val y = event!!.rawY
-            val layoutParams = view!!.layoutParams as FrameLayout.LayoutParams
             when (event.action and MotionEvent.ACTION_MASK) {
                 MotionEvent.ACTION_DOWN -> {
-                    mYDelta = y - view.y
+                    mYDelta = touchY - currentViewY
                 }
                 MotionEvent.ACTION_UP -> {
-                    if (view.y - mViewY > Utils.dpToPx(32)) {
+                    if (currentViewY - mViewY > Utils.dpToPx(32)) {
                         removeView()
                     } else {
                         restoreViewPosition()
                     }
                 }
                 MotionEvent.ACTION_MOVE -> {
-                    val newY = if ((y - mYDelta) < mViewY) mViewY else (y - mYDelta)
+                    val newY = if ((touchY - mYDelta) < mViewY) mViewY else (touchY - mYDelta)
                     view.y = newY
                 }
                 else -> {
