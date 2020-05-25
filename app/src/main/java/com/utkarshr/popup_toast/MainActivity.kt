@@ -16,7 +16,7 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), View.OnLayoutChangeListener {
 
     var mView: View? = null
 
@@ -49,37 +49,7 @@ class MainActivity : AppCompatActivity() {
         mView?.x = Utils.dpToPx(200).toFloat()
         mView?.y = Utils.dpToPx(200).toFloat()
 
-        val listener = object: View.OnLayoutChangeListener {
-            override fun onLayoutChange(
-                view: View,
-                left: Int,
-                top: Int,
-                right: Int,
-                bottom: Int,
-                oldLeft: Int,
-                oldTop: Int,
-                oldRight: Int,
-                oldBottom: Int
-            ) {
-                view.visibility = View.VISIBLE
-                val viewWidth = view.width
-                val viewHeight = view.height
-                val newX = (Utils.screenWidth - viewWidth)/2
-                val startY = mRootViewGroup!!.height
-                val finalY = mRootViewGroup!!.height - viewHeight - Utils.dpToPx(24)
-                view.x = newX.toFloat()
-                view.y = startY.toFloat()
-
-                val anim = ObjectAnimator.ofFloat(view, "translationY", finalY.toFloat())
-                anim.duration = 300
-                anim.interpolator = OvershootInterpolator(2f)
-                anim.start()
-
-                view.removeOnLayoutChangeListener(this)
-            }
-
-        }
-        mView?.addOnLayoutChangeListener(listener)
+        mView?.addOnLayoutChangeListener(this)
 
         mView?.visibility = View.INVISIBLE
         mRootViewGroup?.addView(mView, LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT))
@@ -105,6 +75,34 @@ class MainActivity : AppCompatActivity() {
                 }
             })
         }
+    }
+
+    override fun onLayoutChange(
+        view: View,
+        left: Int,
+        top: Int,
+        right: Int,
+        bottom: Int,
+        oldLeft: Int,
+        oldTop: Int,
+        oldRight: Int,
+        oldBottom: Int
+    ) {
+        view.visibility = View.VISIBLE
+        val viewWidth = view.width
+        val viewHeight = view.height
+        val newX = (Utils.screenWidth - viewWidth)/2
+        val startY = mRootViewGroup!!.height
+        val finalY = mRootViewGroup!!.height - viewHeight - Utils.dpToPx(24)
+        view.x = newX.toFloat()
+        view.y = startY.toFloat()
+
+        val anim = ObjectAnimator.ofFloat(view, "translationY", finalY.toFloat())
+        anim.duration = 300
+        anim.interpolator = OvershootInterpolator(2f)
+        anim.start()
+
+        view.removeOnLayoutChangeListener(this)
     }
 
 }
