@@ -1,3 +1,3 @@
 # Popup-Toast
 
-Display a toast like in Reddit app
+Displays a toast like in Reddit app
