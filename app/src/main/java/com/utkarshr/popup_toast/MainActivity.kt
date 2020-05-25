@@ -5,35 +5,36 @@ import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.MotionEvent
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.view.animation.OvershootInterpolator
 import android.widget.Button
-import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import com.utkarshr.popup_toast.Utils.Companion.dpToPx
+import androidx.core.view.GestureDetectorCompat
 import com.utkarshr.popup_toast.Utils.Companion.ifLet
+import java.lang.ref.WeakReference
+import kotlin.math.abs
 
 
 class MainActivity : AppCompatActivity(), View.OnLayoutChangeListener, View.OnTouchListener {
 
     var mView: View? = null
-
     var mRootViewGroup: ViewGroup? = null
 
-    private var mTopMargin = 0
+    private var gestureDetector: GestureDetectorCompat? = null
+
     private var mViewY = 0f
     private var mYDelta = 0f
+    private var mPaddingFromBottom = 0f
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        gestureDetector = GestureDetectorCompat(this, FlingGestureListener(this))
         mRootViewGroup = window.decorView.rootView.findViewById(android.R.id.content) as ViewGroup
+        mPaddingFromBottom = Utils.dpToPx(24).toFloat()
 
         findViewById<Button>(R.id.createView).setOnClickListener {
             createView(this)
@@ -68,25 +69,23 @@ class MainActivity : AppCompatActivity(), View.OnLayoutChangeListener, View.OnTo
         )
     }
 
-    private fun removeView() {
+    fun removeView() {
         mView?.let {
-            val finalY = mRootViewGroup!!.height
+            val finalY = mRootViewGroup!!.height + Utils.dpToPx(16).toFloat()
             val anim = ObjectAnimator.ofFloat(it, "translationY", finalY.toFloat())
-            anim.duration = 300
+            anim.duration = 400
             anim.interpolator = OvershootInterpolator(2f)
             anim.start()
             anim.addListener(object : Animator.AnimatorListener {
-                override fun onAnimationRepeat(p0: Animator?) {
-                }
-
                 override fun onAnimationEnd(p0: Animator?) {
                     mRootViewGroup?.removeView(it)
                     mView = null
                 }
 
+                override fun onAnimationRepeat(p0: Animator?) {
+                }
                 override fun onAnimationCancel(p0: Animator?) {
                 }
-
                 override fun onAnimationStart(p0: Animator?) {
                 }
             })
@@ -95,18 +94,48 @@ class MainActivity : AppCompatActivity(), View.OnLayoutChangeListener, View.OnTo
 
     private fun restoreViewPosition() {
         mView?.let {
-
             val viewHeight = it.height
-            val finalY = mRootViewGroup!!.height - viewHeight - dpToPx(24)
-            val anim = ObjectAnimator.ofFloat(it, "translationY", finalY.toFloat())
+            val finalY = mRootViewGroup!!.height - viewHeight - mPaddingFromBottom
+            val anim = ObjectAnimator.ofFloat(it, "translationY", finalY)
+            anim.duration = 300
+            anim.interpolator = OvershootInterpolator(2f)
+            anim.start()
+        }
+    }
+
+    fun overShootView() {
+        mView?.let {
+            val finalY = mRootViewGroup!!.height - it.height - mPaddingFromBottom
+            val overShootY = finalY - Utils.dpToPx(12)
+
+            it.y = overShootY
+            val anim = ObjectAnimator.ofFloat(it, "translationY", finalY)
             anim.duration = 300
             anim.interpolator = OvershootInterpolator(2f)
             anim.start()
 
+            //The above animation has a jerk. Need to fo it properly.
+//            val anim = ObjectAnimator.ofFloat(it, "translationY", overShootY)
+//            anim.duration = 150
+//            anim.interpolator = AccelerateInterpolator()
+//            anim.start()
+//            anim.addListener(object : Animator.AnimatorListener {
+//                override fun onAnimationEnd(p0: Animator?) {
+//                    val anim1 = ObjectAnimator.ofFloat(it, "translationY", finalY)
+//                    anim1.duration = 150
+//                    anim1.interpolator = AccelerateInterpolator()
+//                    anim1.start()
+//                }
+//
+//                override fun onAnimationRepeat(p0: Animator?) {
+//                }
+//                override fun onAnimationCancel(p0: Animator?) {
+//                }
+//                override fun onAnimationStart(p0: Animator?) {
+//                }
+//            })
         }
     }
-
-
 
     override fun onLayoutChange(
         view: View?,
@@ -124,11 +153,10 @@ class MainActivity : AppCompatActivity(), View.OnLayoutChangeListener, View.OnTo
         val viewHeight = view?.height ?: 0
         val newX = (Utils.screenWidth - viewWidth) / 2
         val startY = mRootViewGroup!!.height
-        val finalY = mRootViewGroup!!.height - viewHeight - Utils.dpToPx(24)
+        val finalY = mRootViewGroup!!.height - viewHeight - mPaddingFromBottom
         view?.x = newX.toFloat()
         view?.y = startY.toFloat()
 
-        mTopMargin = (view?.layoutParams as FrameLayout.LayoutParams).topMargin
         mViewY = finalY.toFloat()
 
         val anim = ObjectAnimator.ofFloat(view, "translationY", finalY.toFloat())
@@ -136,7 +164,7 @@ class MainActivity : AppCompatActivity(), View.OnLayoutChangeListener, View.OnTo
         anim.interpolator = OvershootInterpolator(2f)
         anim.start()
 
-        view.removeOnLayoutChangeListener(this)
+        view?.removeOnLayoutChangeListener(this)
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -150,7 +178,7 @@ class MainActivity : AppCompatActivity(), View.OnLayoutChangeListener, View.OnTo
                     mYDelta = touchY - currentViewY
                 }
                 MotionEvent.ACTION_UP -> {
-                    if (currentViewY - mViewY > Utils.dpToPx(32)) {
+                    if (currentViewY - mViewY > mPaddingFromBottom) {
                         removeView()
                     } else {
                         restoreViewPosition()
@@ -165,7 +193,40 @@ class MainActivity : AppCompatActivity(), View.OnLayoutChangeListener, View.OnTo
             }
             mRootViewGroup!!.invalidate()
         }
-        return true
+        return !(gestureDetector?.onTouchEvent(event) ?: false)
     }
 
+    private class FlingGestureListener(activity: MainActivity) : GestureDetector.SimpleOnGestureListener() {
+
+        val weakActivity:  WeakReference<MainActivity> = WeakReference(activity)
+
+        companion object {
+            val flingThreshold = Utils.dpToPx(24)
+            val velocityThreshold = 100
+        }
+
+        override fun onFling(
+            event1: MotionEvent,
+            event2: MotionEvent,
+            velocityX: Float,
+            velocityY: Float
+        ): Boolean {
+
+            val activity = weakActivity.get()
+
+            activity?.let {
+                val diffY: Float = event2.rawY - event1.rawY
+
+                if (abs(diffY) > flingThreshold
+                    && abs(velocityY) > velocityThreshold) {
+                    if (diffY > 0) {
+                        it.removeView()
+                    } else {
+                        it.overShootView()
+                    }
+                }
+            }
+            return true
+        }
+    }
 }
