@@ -16,6 +16,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import com.utkarshr.popup_toast.Utils.Companion.dpToPx
 import com.utkarshr.popup_toast.Utils.Companion.ifLet
 
 
@@ -26,8 +27,8 @@ class MainActivity : AppCompatActivity(), View.OnLayoutChangeListener, View.OnTo
     var mRootViewGroup: ViewGroup? = null
 
     private var mTopMargin = 0
-    private var mViewY = 0
-    private var mYDelta = 0
+    private var mViewY = 0f
+    private var mYDelta = 0f
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -94,6 +95,21 @@ class MainActivity : AppCompatActivity(), View.OnLayoutChangeListener, View.OnTo
         }
     }
 
+    private fun restoreViewPosition() {
+        mView?.let {
+
+            val viewHeight = it.height
+            val finalY = mRootViewGroup!!.height - viewHeight - dpToPx(24)
+            val anim = ObjectAnimator.ofFloat(it, "translationY", finalY.toFloat())
+            anim.duration = 300
+            anim.interpolator = OvershootInterpolator(2f)
+            anim.start()
+
+        }
+    }
+
+
+
     override fun onLayoutChange(
         view: View?,
         left: Int,
@@ -115,7 +131,7 @@ class MainActivity : AppCompatActivity(), View.OnLayoutChangeListener, View.OnTo
         view?.y = startY.toFloat()
 
         mTopMargin = (view?.layoutParams as FrameLayout.LayoutParams).topMargin
-        mViewY = finalY
+        mViewY = finalY.toFloat()
 
         val anim = ObjectAnimator.ofFloat(view, "translationY", finalY.toFloat())
         anim.duration = 300
@@ -128,24 +144,22 @@ class MainActivity : AppCompatActivity(), View.OnLayoutChangeListener, View.OnTo
     override fun onTouch(view: View?, event: MotionEvent?): Boolean {
         ifLet(view, event, mRootViewGroup) {
 
-            val y = event!!.rawY.toInt()
+            val y = event!!.rawY
             val layoutParams = view!!.layoutParams as FrameLayout.LayoutParams
             when (event.action and MotionEvent.ACTION_MASK) {
                 MotionEvent.ACTION_DOWN -> {
-                    mYDelta = y - layoutParams.topMargin
+                    mYDelta = y - view.y
                 }
                 MotionEvent.ACTION_UP -> {
-                    if (layoutParams.topMargin - mTopMargin > Utils.dpToPx(24)) {
+                    if (view.y - mViewY > Utils.dpToPx(32)) {
                         removeView()
                     } else {
-
+                        restoreViewPosition()
                     }
                 }
                 MotionEvent.ACTION_MOVE -> {
-                    val newTopMargin: Int = if ((y - mYDelta) < mTopMargin) mTopMargin else (y - mYDelta)
-                    layoutParams.topMargin = newTopMargin
-                    layoutParams.bottomMargin = -250
-                    view.layoutParams = layoutParams
+                    val newY = if ((y - mYDelta) < mViewY) mViewY else (y - mYDelta)
+                    view.y = newY
                 }
                 else -> {
                 }
