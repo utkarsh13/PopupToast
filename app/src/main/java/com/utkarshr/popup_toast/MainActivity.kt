@@ -4,7 +4,12 @@ import android.animation.Animator
 import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
+import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Message
 import android.view.*
 import android.view.animation.OvershootInterpolator
 import android.widget.Button
@@ -22,7 +27,9 @@ class MainActivity : AppCompatActivity(), View.OnLayoutChangeListener, View.OnTo
     var mView: View? = null
     var mRootViewGroup: ViewGroup? = null
 
-    private var gestureDetector: GestureDetectorCompat? = null
+    lateinit var mHandler: Handler
+
+    private lateinit var gestureDetector: GestureDetectorCompat
 
     private var mViewY = 0f
     private var mYDelta = 0f
@@ -35,6 +42,12 @@ class MainActivity : AppCompatActivity(), View.OnLayoutChangeListener, View.OnTo
         gestureDetector = GestureDetectorCompat(this, FlingGestureListener(this))
         mRootViewGroup = window.decorView.rootView.findViewById(android.R.id.content) as ViewGroup
         mPaddingFromBottom = Utils.dpToPx(24).toFloat()
+        mHandler = @SuppressLint("HandlerLeak")
+        object : Handler() {
+            override fun handleMessage(msg: Message) {
+                super.handleMessage(msg)
+            }
+        }
 
         findViewById<Button>(R.id.createView).setOnClickListener {
             createView(this)
@@ -51,7 +64,7 @@ class MainActivity : AppCompatActivity(), View.OnLayoutChangeListener, View.OnTo
         }
         val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         mView = inflater.inflate(R.layout.view_popup_toast, null)
-        mView?.findViewById<TextView>(R.id.popup_text)?.text = "Popup text"
+        mView?.findViewById<TextView>(R.id.popup_text)?.text = "This is some popup toast"
         //setting some initial position
         mView?.x = Utils.dpToPx(200).toFloat()
         mView?.y = Utils.dpToPx(200).toFloat()
@@ -59,14 +72,36 @@ class MainActivity : AppCompatActivity(), View.OnLayoutChangeListener, View.OnTo
         mView?.addOnLayoutChangeListener(this)
         mView?.setOnTouchListener(this)
 
+        val params = getLayoutParams()
+
+        setViewDrawable()
+
         mView?.visibility = View.INVISIBLE
         mRootViewGroup?.addView(
             mView,
-            LinearLayout.LayoutParams(
+            params
+        )
+    }
+
+    private fun getLayoutParams(): LinearLayout.LayoutParams {
+        val params = LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.WRAP_CONTENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT
-            )
         )
+        params.marginStart = Utils.dpToPx(64)
+        params.marginEnd = Utils.dpToPx(64)
+        return params
+    }
+
+    private fun setViewDrawable() {
+        val shape = GradientDrawable()
+        shape.shape = GradientDrawable.RECTANGLE
+        shape.setColor(Color.GRAY)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            mView?.clipToOutline = true
+            shape.cornerRadius = Utils.dpToPx(6).toFloat()
+        }
+        mView?.background = shape
     }
 
     fun removeView() {
@@ -89,51 +124,6 @@ class MainActivity : AppCompatActivity(), View.OnLayoutChangeListener, View.OnTo
                 override fun onAnimationStart(p0: Animator?) {
                 }
             })
-        }
-    }
-
-    private fun restoreViewPosition() {
-        mView?.let {
-            val viewHeight = it.height
-            val finalY = mRootViewGroup!!.height - viewHeight - mPaddingFromBottom
-            val anim = ObjectAnimator.ofFloat(it, "translationY", finalY)
-            anim.duration = 300
-            anim.interpolator = OvershootInterpolator(2f)
-            anim.start()
-        }
-    }
-
-    fun overShootView() {
-        mView?.let {
-            val finalY = mRootViewGroup!!.height - it.height - mPaddingFromBottom
-            val overShootY = finalY - Utils.dpToPx(12)
-
-            it.y = overShootY
-            val anim = ObjectAnimator.ofFloat(it, "translationY", finalY)
-            anim.duration = 300
-            anim.interpolator = OvershootInterpolator(2f)
-            anim.start()
-
-            //The above animation has a jerk. Need to fo it properly.
-//            val anim = ObjectAnimator.ofFloat(it, "translationY", overShootY)
-//            anim.duration = 150
-//            anim.interpolator = AccelerateInterpolator()
-//            anim.start()
-//            anim.addListener(object : Animator.AnimatorListener {
-//                override fun onAnimationEnd(p0: Animator?) {
-//                    val anim1 = ObjectAnimator.ofFloat(it, "translationY", finalY)
-//                    anim1.duration = 150
-//                    anim1.interpolator = AccelerateInterpolator()
-//                    anim1.start()
-//                }
-//
-//                override fun onAnimationRepeat(p0: Animator?) {
-//                }
-//                override fun onAnimationCancel(p0: Animator?) {
-//                }
-//                override fun onAnimationStart(p0: Animator?) {
-//                }
-//            })
         }
     }
 
@@ -164,7 +154,36 @@ class MainActivity : AppCompatActivity(), View.OnLayoutChangeListener, View.OnTo
         anim.interpolator = OvershootInterpolator(2f)
         anim.start()
 
+        Handler().postDelayed( {
+            removeView()
+        }, 3000)
+
         view?.removeOnLayoutChangeListener(this)
+    }
+
+    private fun restoreViewPosition() {
+        mView?.let {
+            val viewHeight = it.height
+            val finalY = mRootViewGroup!!.height - viewHeight - mPaddingFromBottom
+            val anim = ObjectAnimator.ofFloat(it, "translationY", finalY)
+            anim.duration = 300
+            anim.interpolator = OvershootInterpolator(2f)
+            anim.start()
+        }
+    }
+
+    fun overShootView() {
+        mView?.let {
+            val finalY = mRootViewGroup!!.height - it.height - mPaddingFromBottom
+            val overShootY = finalY - Utils.dpToPx(12)
+
+            it.y = overShootY
+            val anim = ObjectAnimator.ofFloat(it, "translationY", finalY)
+            anim.duration = 300
+            anim.interpolator = OvershootInterpolator(2f)
+            anim.start()
+            //The above animation has a jerk. Need to fo it properly.
+        }
     }
 
     @SuppressLint("ClickableViewAccessibility")
