@@ -45,16 +45,31 @@ class MainActivity : AppCompatActivity(), View.OnLayoutChangeListener, View.OnTo
         mHandler = @SuppressLint("HandlerLeak")
         object : Handler() {
             override fun handleMessage(msg: Message) {
-                super.handleMessage(msg)
+                when (msg.what) {
+                    ToastHandlerMessage.MSG_SHOW.value -> {
+                        createView(this@MainActivity)
+                    }
+                    ToastHandlerMessage.MSG_HIDE.value -> {
+                        mHandler.removeMessages(ToastHandlerMessage.MSG_HIDE.value)
+                        removeView()
+                    }
+                    ToastHandlerMessage.MSG_REMOVE_TIMER.value -> {
+                        mHandler.removeMessages(ToastHandlerMessage.MSG_HIDE.value)
+                        mHandler.removeMessages(ToastHandlerMessage.MSG_REMOVE_TIMER.value)
+                    }
+                    ToastHandlerMessage.MSG_ADD_TIMER.value -> {
+                        mHandler.sendEmptyMessageDelayed(ToastHandlerMessage.MSG_HIDE.value, 1000)
+                    }
+                }
             }
         }
 
         findViewById<Button>(R.id.createView).setOnClickListener {
-            createView(this)
+            mHandler.sendEmptyMessage(ToastHandlerMessage.MSG_SHOW.value)
         }
 
         findViewById<Button>(R.id.removeView).setOnClickListener {
-            removeView()
+            mHandler.sendEmptyMessage(ToastHandlerMessage.MSG_HIDE.value)
         }
     }
 
@@ -83,27 +98,6 @@ class MainActivity : AppCompatActivity(), View.OnLayoutChangeListener, View.OnTo
         )
     }
 
-    private fun getLayoutParams(): LinearLayout.LayoutParams {
-        val params = LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-        )
-        params.marginStart = Utils.dpToPx(64)
-        params.marginEnd = Utils.dpToPx(64)
-        return params
-    }
-
-    private fun setViewDrawable() {
-        val shape = GradientDrawable()
-        shape.shape = GradientDrawable.RECTANGLE
-        shape.setColor(Color.GRAY)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            mView?.clipToOutline = true
-            shape.cornerRadius = Utils.dpToPx(6).toFloat()
-        }
-        mView?.background = shape
-    }
-
     fun removeView() {
         mView?.let {
             val finalY = mRootViewGroup!!.height + Utils.dpToPx(16).toFloat()
@@ -125,6 +119,27 @@ class MainActivity : AppCompatActivity(), View.OnLayoutChangeListener, View.OnTo
                 }
             })
         }
+    }
+
+    private fun getLayoutParams(): LinearLayout.LayoutParams {
+        val params = LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+        params.marginStart = Utils.dpToPx(64)
+        params.marginEnd = Utils.dpToPx(64)
+        return params
+    }
+
+    private fun setViewDrawable() {
+        val shape = GradientDrawable()
+        shape.shape = GradientDrawable.RECTANGLE
+        shape.setColor(Color.GRAY)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            mView?.clipToOutline = true
+            shape.cornerRadius = Utils.dpToPx(6).toFloat()
+        }
+        mView?.background = shape
     }
 
     override fun onLayoutChange(
@@ -154,9 +169,7 @@ class MainActivity : AppCompatActivity(), View.OnLayoutChangeListener, View.OnTo
         anim.interpolator = OvershootInterpolator(2f)
         anim.start()
 
-        Handler().postDelayed( {
-            removeView()
-        }, 3000)
+        mHandler.sendEmptyMessageDelayed(ToastHandlerMessage.MSG_HIDE.value, 3000)
 
         view?.removeOnLayoutChangeListener(this)
     }
@@ -194,9 +207,11 @@ class MainActivity : AppCompatActivity(), View.OnLayoutChangeListener, View.OnTo
 
             when (event.action and MotionEvent.ACTION_MASK) {
                 MotionEvent.ACTION_DOWN -> {
+                    mHandler.sendEmptyMessage(ToastHandlerMessage.MSG_REMOVE_TIMER.value)
                     mYDelta = touchY - currentViewY
                 }
                 MotionEvent.ACTION_UP -> {
+                    mHandler.sendEmptyMessage(ToastHandlerMessage.MSG_ADD_TIMER.value)
                     if (currentViewY - mViewY > mPaddingFromBottom) {
                         removeView()
                     } else {
@@ -248,4 +263,11 @@ class MainActivity : AppCompatActivity(), View.OnLayoutChangeListener, View.OnTo
             return true
         }
     }
+}
+
+enum class ToastHandlerMessage(val value: Int) {
+    MSG_SHOW(1),
+    MSG_HIDE(2),
+    MSG_REMOVE_TIMER(3),
+    MSG_ADD_TIMER(4)
 }
