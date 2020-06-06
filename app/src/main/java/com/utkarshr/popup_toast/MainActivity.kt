@@ -137,7 +137,7 @@ class MainActivity : AppCompatActivity(), View.OnLayoutChangeListener, View.OnTo
         shape.setColor(Color.GRAY)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             mView?.clipToOutline = true
-            shape.cornerRadius = Utils.dpToPx(6).toFloat()
+            shape.cornerRadius = Utils.dpToPx(5).toFloat()
         }
         mView?.background = shape
     }
