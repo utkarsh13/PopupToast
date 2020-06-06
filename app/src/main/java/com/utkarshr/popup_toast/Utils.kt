@@ -1,5 +1,8 @@
 package com.utkarshr.popup_toast
 
+import android.app.Activity
+import android.content.Context
+import android.content.ContextWrapper
 import android.content.res.Resources
 
 class Utils {
@@ -23,6 +26,11 @@ class Utils {
             if (elements.all { it != null }) {
                 closure(elements.filterNotNull())
             }
+        }
+
+        fun getActivity(context: Context): Activity? {
+            if (context is Activity) return context
+            return if (context is ContextWrapper) getActivity(context.baseContext) else null
         }
     }
 
