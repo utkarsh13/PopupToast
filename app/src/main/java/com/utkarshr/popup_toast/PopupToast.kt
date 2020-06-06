@@ -28,7 +28,7 @@ class PopupToast(private val mContext: Context): View.OnLayoutChangeListener, Vi
 
     private var mViewY = 0f
     private var mYDelta = 0f
-    private var mPaddingFromBottom = 0f
+    private val mPaddingFromBottom = Utils.dpToPx(24).toFloat()
 
     init {
         val activityFromContext = Utils.getActivity(mContext)
@@ -36,28 +36,7 @@ class PopupToast(private val mContext: Context): View.OnLayoutChangeListener, Vi
         activityFromContext?.let {activity ->
             gestureDetector = GestureDetectorCompat(mContext, FlingGestureListener(this))
             mRootViewGroup = activity.window.decorView.rootView.findViewById(android.R.id.content) as ViewGroup
-            mPaddingFromBottom = Utils.dpToPx(24).toFloat()
-            mHandler = @SuppressLint("HandlerLeak")
-            object : Handler() {
-                override fun handleMessage(msg: Message) {
-                    when (msg.what) {
-                        ToastHandlerMessage.MSG_SHOW.value -> {
-                            addViewToSuperview()
-                        }
-                        ToastHandlerMessage.MSG_HIDE.value -> {
-                            mHandler.removeMessages(ToastHandlerMessage.MSG_HIDE.value)
-                            removeView()
-                        }
-                        ToastHandlerMessage.MSG_REMOVE_TIMER.value -> {
-                            mHandler.removeMessages(ToastHandlerMessage.MSG_HIDE.value)
-                            mHandler.removeMessages(ToastHandlerMessage.MSG_REMOVE_TIMER.value)
-                        }
-                        ToastHandlerMessage.MSG_ADD_TIMER.value -> {
-                            mHandler.sendEmptyMessageDelayed(ToastHandlerMessage.MSG_HIDE.value, 1000)
-                        }
-                    }
-                }
-            }
+            mHandler = ToastHandler(this)
 
             createView(mContext)
         }
@@ -233,7 +212,7 @@ class PopupToast(private val mContext: Context): View.OnLayoutChangeListener, Vi
 
     private class FlingGestureListener(popupToast: PopupToast) : GestureDetector.SimpleOnGestureListener() {
 
-        val weakActivity: WeakReference<PopupToast> = WeakReference(popupToast)
+        private val weakToast: WeakReference<PopupToast> = WeakReference(popupToast)
 
         companion object {
             val flingThreshold = Utils.dpToPx(24)
@@ -247,7 +226,7 @@ class PopupToast(private val mContext: Context): View.OnLayoutChangeListener, Vi
             velocityY: Float
         ): Boolean {
 
-            val popupToast = weakActivity.get()
+            val popupToast = weakToast.get()
 
             popupToast?.let {
                 val diffY: Float = event2.rawY - event1.rawY
@@ -265,4 +244,33 @@ class PopupToast(private val mContext: Context): View.OnLayoutChangeListener, Vi
         }
     }
 
+    private class ToastHandler(popupToast: PopupToast) : Handler() {
+        private val weakToast: WeakReference<PopupToast> = WeakReference(popupToast)
+
+        override fun handleMessage(msg: Message) {
+            val popupToast = weakToast.get()
+            popupToast?.let {
+                when (msg.what) {
+                    ToastHandlerMessage.MSG_SHOW.value -> {
+                        it.addViewToSuperview()
+                    }
+                    ToastHandlerMessage.MSG_HIDE.value -> {
+                        it.mHandler.removeMessages(ToastHandlerMessage.MSG_HIDE.value)
+                        it.removeView()
+                    }
+                    ToastHandlerMessage.MSG_REMOVE_TIMER.value -> {
+                        it.mHandler.removeMessages(ToastHandlerMessage.MSG_HIDE.value)
+                        it.mHandler.removeMessages(ToastHandlerMessage.MSG_REMOVE_TIMER.value)
+                    }
+                    ToastHandlerMessage.MSG_ADD_TIMER.value -> {
+                        it.mHandler.sendEmptyMessageDelayed(ToastHandlerMessage.MSG_HIDE.value, 1000)
+                    }
+                    else -> {
+                    }
+                }
+            }
+
+        }
+
+    }
 }
