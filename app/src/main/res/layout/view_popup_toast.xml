@@ -9,6 +9,7 @@
     android:orientation="horizontal">
 
     <View
+        android:id="@+id/left_view"
         android:layout_width="8dp"
         android:layout_height="fill_parent"
         android:layout_marginEnd="10dp"

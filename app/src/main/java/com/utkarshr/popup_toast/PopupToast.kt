@@ -24,31 +24,24 @@ class PopupToast(private val mContext: Context): View.OnLayoutChangeListener, Vi
 
     private lateinit var mHandler: Handler
 
-    private lateinit var gestureDetector: GestureDetectorCompat
+    private lateinit var mGestureDetector: GestureDetectorCompat
 
     private var mViewY = 0f
     private var mYDelta = 0f
     private val mPaddingFromBottom = Utils.dpToPx(24).toFloat()
+    private var mToastDuration = 3000   //time in ms
+    private var mPostHoldDuration = 1000   //time in ms
 
     init {
         val activityFromContext = Utils.getActivity(mContext)
 
         activityFromContext?.let {activity ->
-            gestureDetector = GestureDetectorCompat(mContext, FlingGestureListener(this))
+            mGestureDetector = GestureDetectorCompat(mContext, FlingGestureListener(this))
             mRootViewGroup = activity.window.decorView.rootView.findViewById(android.R.id.content) as ViewGroup
             mHandler = ToastHandler(this)
 
             createView(mContext)
         }
-    }
-
-    fun setText(text: String): PopupToast {
-        mView?.findViewById<TextView>(R.id.popup_text)?.text = text
-        return this
-    }
-
-    fun show() {
-        mHandler.sendEmptyMessage(ToastHandlerMessage.MSG_SHOW.value)
     }
 
     @SuppressLint("InflateParams")
@@ -175,7 +168,7 @@ class PopupToast(private val mContext: Context): View.OnLayoutChangeListener, Vi
         anim.interpolator = OvershootInterpolator(2f)
         anim.start()
 
-        mHandler.sendEmptyMessageDelayed(ToastHandlerMessage.MSG_HIDE.value, 3000)
+        mHandler.sendEmptyMessageDelayed(ToastHandlerMessage.MSG_HIDE.value, mToastDuration.toLong())
 
         view?.removeOnLayoutChangeListener(this)
     }
@@ -208,7 +201,26 @@ class PopupToast(private val mContext: Context): View.OnLayoutChangeListener, Vi
             }
             mRootViewGroup!!.invalidate()
         }
-        return !gestureDetector.onTouchEvent(event)
+        return !mGestureDetector.onTouchEvent(event)
+    }
+
+    fun setText(text: String): PopupToast {
+        mView?.findViewById<TextView>(R.id.popup_text)?.text = text
+        return this
+    }
+
+    fun setDuration(duration: Int): PopupToast {
+        mToastDuration = duration
+        return this
+    }
+
+    fun setColor(color: Int): PopupToast {
+        mView?.findViewById<View>(R.id.left_view)?.setBackgroundColor(color)
+        return this
+    }
+
+    fun show() {
+        mHandler.sendEmptyMessage(ToastHandlerMessage.MSG_SHOW.value)
     }
 
     private class FlingGestureListener(popupToast: PopupToast) : GestureDetector.SimpleOnGestureListener() {
@@ -264,7 +276,7 @@ class PopupToast(private val mContext: Context): View.OnLayoutChangeListener, Vi
                         it.mHandler.removeMessages(ToastHandlerMessage.MSG_REMOVE_TIMER.value)
                     }
                     ToastHandlerMessage.MSG_ADD_TIMER.value -> {
-                        it.mHandler.sendEmptyMessageDelayed(ToastHandlerMessage.MSG_HIDE.value, 1000)
+                        it.mHandler.sendEmptyMessageDelayed(ToastHandlerMessage.MSG_HIDE.value, it.mPostHoldDuration.toLong())
                     }
                     else -> {
                     }
