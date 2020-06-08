@@ -13,9 +13,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         findViewById<Button>(R.id.createView).setOnClickListener {
-            val toast = PopupToast(this)
-            toast.setText("Toast moved to different class")
-            toast.show()
+            PopupToast(this).setText("Toast moved to different class").show()
         }
 
     }

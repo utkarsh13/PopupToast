@@ -42,8 +42,9 @@ class PopupToast(private val mContext: Context): View.OnLayoutChangeListener, Vi
         }
     }
 
-    fun setText(text: String) {
+    fun setText(text: String): PopupToast {
         mView?.findViewById<TextView>(R.id.popup_text)?.text = text
+        return this
     }
 
     fun show() {
