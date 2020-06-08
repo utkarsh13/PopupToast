@@ -6,11 +6,13 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
+import android.media.Image
 import android.os.Build
 import android.os.Handler
 import android.os.Message
 import android.view.*
 import android.view.animation.OvershootInterpolator
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.view.GestureDetectorCompat
@@ -119,10 +121,10 @@ class PopupToast(private val mContext: Context): View.OnLayoutChangeListener, Vi
         return params
     }
 
-    private fun setViewDrawable() {
+    private fun setViewDrawable(color: Int = Color.WHITE) {
         val shape = GradientDrawable()
         shape.shape = GradientDrawable.RECTANGLE
-        shape.setColor(Color.GRAY)
+        shape.setColor(color)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             mView?.clipToOutline = true
             shape.cornerRadius = Utils.dpToPx(5).toFloat()
@@ -216,6 +218,13 @@ class PopupToast(private val mContext: Context): View.OnLayoutChangeListener, Vi
 
     fun setColor(color: Int): PopupToast {
         mView?.findViewById<View>(R.id.left_view)?.setBackgroundColor(color)
+        mView?.findViewById<TextView>(R.id.popup_text)?.setTextColor(color)
+        mView?.findViewById<ImageView>(R.id.image_view)?.setColorFilter(color)
+        return this
+    }
+
+    fun setBgColor(color: Int): PopupToast {
+        setViewDrawable(color)
         return this
     }
 

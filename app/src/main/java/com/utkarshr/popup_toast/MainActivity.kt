@@ -17,7 +17,8 @@ class MainActivity : AppCompatActivity() {
             PopupToast(this)
                 .setText("Toast moved to different class")
                 .setDuration(5000)
-                .setColor(Color.GREEN)
+                .setColor(Color.RED)
+                .setBgColor(Color.BLACK)
                 .show()
         }
 
