@@ -17,8 +17,8 @@
 
     <ImageView
         android:id="@+id/image_view"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
         android:layout_gravity="center_vertical"
         android:layout_marginEnd="12dp"
         app:srcCompat="@drawable/ic_success_white" />
@@ -27,10 +27,12 @@
         android:id="@+id/popup_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:fontFamily="sans-serif"
         android:maxLines="2"
         android:paddingTop="12dp"
         android:paddingBottom="12dp"
-        android:layout_marginEnd="16dp"
+        android:textAlignment="viewStart"
         android:textSize="15sp"
         tools:text="This is a textView" />
 </LinearLayout>

@@ -16,7 +16,7 @@ class MainActivity : AppCompatActivity() {
         findViewById<Button>(R.id.createView).setOnClickListener {
             PopupToast(this)
                 .setStyle(ToastStyle.ERROR)
-                .setText("Toast moved to class")
+                .setText("Toast moved to class new abc")
                 .show()
         }
 

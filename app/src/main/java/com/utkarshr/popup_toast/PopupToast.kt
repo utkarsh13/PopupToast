@@ -210,33 +210,48 @@ class PopupToast(private val mContext: Context): View.OnLayoutChangeListener, Vi
     fun setStyle(style: ToastStyle): PopupToast {
         when (style) {
             ToastStyle.INFO -> {
-                setIcon(R.drawable.ic_info_white)
-                setThemeColor(ContextCompat.getColor(mContext, R.color.colorInfoDark))
-                setBgColor(ContextCompat.getColor(mContext, R.color.colorInfoLight))
+                val darkColor = ContextCompat.getColor(mContext, R.color.colorInfoDark)
+                val lightColor = ContextCompat.getColor(mContext, R.color.colorInfoLight)
+                setIcon(R.drawable.ic_info_white, darkColor)
+                setThemeColor(darkColor)
+                setBgColor(lightColor)
+                mView?.findViewById<TextView>(R.id.popup_text)?.setTextColor(darkColor)
             }
             ToastStyle.SUCCESS -> {
-                setIcon(R.drawable.ic_success_white)
-                setThemeColor(ContextCompat.getColor(mContext, R.color.colorSuccessDark))
-                setBgColor(ContextCompat.getColor(mContext, R.color.colorSuccessLight))
+                val darkColor = ContextCompat.getColor(mContext, R.color.colorSuccessDark)
+                val lightColor = ContextCompat.getColor(mContext, R.color.colorSuccessLight)
+                setIcon(R.drawable.ic_success_white, darkColor)
+                setThemeColor(darkColor)
+                setBgColor(lightColor)
+                mView?.findViewById<TextView>(R.id.popup_text)?.setTextColor(darkColor)
             }
             ToastStyle.WARNING -> {
-                setIcon(R.drawable.ic_warning_white)
-                setThemeColor(ContextCompat.getColor(mContext, R.color.colorWarningDark))
-                setBgColor(ContextCompat.getColor(mContext, R.color.colorWarningLight))
+                val darkColor = ContextCompat.getColor(mContext, R.color.colorWarningDark)
+                val lightColor = ContextCompat.getColor(mContext, R.color.colorWarningLight)
+                setIcon(R.drawable.ic_warning_white, darkColor)
+                setThemeColor(darkColor)
+                setBgColor(lightColor)
+                mView?.findViewById<TextView>(R.id.popup_text)?.setTextColor(darkColor)
             }
             ToastStyle.ERROR -> {
-                setIcon(R.drawable.ic_error_white)
-                setThemeColor(ContextCompat.getColor(mContext, R.color.colorErrorDark))
-                setBgColor(ContextCompat.getColor(mContext, R.color.colorErrorLight))
+                val darkColor = ContextCompat.getColor(mContext, R.color.colorErrorDark)
+                val lightColor = ContextCompat.getColor(mContext, R.color.colorErrorLight)
+                setIcon(R.drawable.ic_error_white, darkColor)
+                setThemeColor(darkColor)
+                setBgColor(lightColor)
+                mView?.findViewById<TextView>(R.id.popup_text)?.setTextColor(darkColor)
             }
         }
         return this
     }
 
-    fun setText(text: String, color: Int = Color.WHITE): PopupToast {
+    fun setText(text: String, color: Int? = null): PopupToast {
         mView?.findViewById<TextView>(R.id.popup_text)?.let {
             it.text = text
-            it.setTextColor(color)
+            color?.let {col ->
+                it.setTextColor(col)
+            }
+
         }
         return this
     }
