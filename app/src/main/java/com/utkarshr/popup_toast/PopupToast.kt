@@ -15,6 +15,7 @@ import android.view.animation.OvershootInterpolator
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.core.view.GestureDetectorCompat
 import java.lang.ref.WeakReference
 import kotlin.math.abs
@@ -204,6 +205,32 @@ class PopupToast(private val mContext: Context): View.OnLayoutChangeListener, Vi
             mRootViewGroup!!.invalidate()
         }
         return !mGestureDetector.onTouchEvent(event)
+    }
+
+    fun setStyle(style: ToastStyle): PopupToast {
+        when (style) {
+            ToastStyle.INFO -> {
+                setIcon(R.drawable.ic_info_white)
+                setThemeColor(ContextCompat.getColor(mContext, R.color.colorInfoDark))
+                setBgColor(ContextCompat.getColor(mContext, R.color.colorInfoLight))
+            }
+            ToastStyle.SUCCESS -> {
+                setIcon(R.drawable.ic_success_white)
+                setThemeColor(ContextCompat.getColor(mContext, R.color.colorSuccessDark))
+                setBgColor(ContextCompat.getColor(mContext, R.color.colorSuccessLight))
+            }
+            ToastStyle.WARNING -> {
+                setIcon(R.drawable.ic_warning_white)
+                setThemeColor(ContextCompat.getColor(mContext, R.color.colorWarningDark))
+                setBgColor(ContextCompat.getColor(mContext, R.color.colorWarningLight))
+            }
+            ToastStyle.ERROR -> {
+                setIcon(R.drawable.ic_error_white)
+                setThemeColor(ContextCompat.getColor(mContext, R.color.colorErrorDark))
+                setBgColor(ContextCompat.getColor(mContext, R.color.colorErrorLight))
+            }
+        }
+        return this
     }
 
     fun setText(text: String, color: Int = Color.WHITE): PopupToast {
