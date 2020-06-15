@@ -34,6 +34,7 @@ class PopupToast(private val mContext: Context): View.OnLayoutChangeListener, Vi
     private val mPaddingFromBottom = Utils.dpToPx(24).toFloat()
     private var mToastDuration = 3000   //time in ms
     private var mPostHoldDuration = 1000   //time in ms
+    private var mToastStyle: ToastStyle? = null
 
     init {
         val activityFromContext = Utils.getActivity(mContext)
@@ -208,6 +209,7 @@ class PopupToast(private val mContext: Context): View.OnLayoutChangeListener, Vi
     }
 
     fun setStyle(style: ToastStyle): PopupToast {
+        mToastStyle = style
         when (style) {
             ToastStyle.INFO -> {
                 val darkColor = ContextCompat.getColor(mContext, R.color.colorInfoDark)
@@ -245,11 +247,11 @@ class PopupToast(private val mContext: Context): View.OnLayoutChangeListener, Vi
         return this
     }
 
-    fun setText(text: String, color: Int? = null): PopupToast {
+    fun setText(text: String, color: Int = Color.WHITE): PopupToast {
         mView?.findViewById<TextView>(R.id.popup_text)?.let {
             it.text = text
-            color?.let {col ->
-                it.setTextColor(col)
+            if (mToastStyle == null) {
+                it.setTextColor(color)
             }
 
         }

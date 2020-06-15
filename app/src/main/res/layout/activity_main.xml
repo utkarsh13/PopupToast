@@ -7,23 +7,65 @@
     tools:context=".MainActivity">
 
     <Button
-        android:id="@+id/createView"
+        android:id="@+id/infoButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="100dp"
-        android:text="Create View"
-        app:layout_constraintEnd_toStartOf="@+id/removeView"
+        android:layout_marginTop="80dp"
+        android:text="Info"
+        app:layout_constraintEnd_toStartOf="@+id/successButton"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
-        android:id="@+id/removeView"
+        android:id="@+id/successButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Remove View"
+        android:text="Success"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/createView"
-        app:layout_constraintTop_toTopOf="@+id/createView" />
+        app:layout_constraintStart_toEndOf="@+id/infoButton"
+        app:layout_constraintTop_toTopOf="@+id/infoButton" />
+
+    <Button
+        android:id="@+id/warningButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="80dp"
+        android:text="Warning"
+        app:layout_constraintEnd_toStartOf="@+id/errorButton"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/infoButton" />
+
+    <Button
+        android:id="@+id/errorButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Error"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/warningButton"
+        app:layout_constraintTop_toTopOf="@+id/warningButton" />
+
+    <Button
+        android:id="@+id/customStyleButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="80dp"
+        android:text="Custom Style"
+        app:layout_constraintEnd_toStartOf="@+id/customViewButton"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/warningButton" />
+
+    <Button
+        android:id="@+id/customViewButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Custom View"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/customStyleButton"
+        app:layout_constraintTop_toTopOf="@+id/customStyleButton" />
 </androidx.constraintlayout.widget.ConstraintLayout>
