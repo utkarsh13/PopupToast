@@ -15,9 +15,10 @@ class MainActivity : AppCompatActivity() {
 
         findViewById<Button>(R.id.createView).setOnClickListener {
             PopupToast(this)
-                .setText("Toast moved to different class")
+                .setText("Toast moved to class")
+                .setIcon(R.drawable.ic_success_white, Color.RED)
                 .setDuration(5000)
-                .setColor(Color.RED)
+                .setThemeColor(Color.RED)
                 .setBgColor(Color.BLACK)
                 .show()
         }

@@ -206,8 +206,11 @@ class PopupToast(private val mContext: Context): View.OnLayoutChangeListener, Vi
         return !mGestureDetector.onTouchEvent(event)
     }
 
-    fun setText(text: String): PopupToast {
-        mView?.findViewById<TextView>(R.id.popup_text)?.text = text
+    fun setText(text: String, color: Int = Color.WHITE): PopupToast {
+        mView?.findViewById<TextView>(R.id.popup_text)?.let {
+            it.text = text
+            it.setTextColor(color)
+        }
         return this
     }
 
@@ -216,15 +219,21 @@ class PopupToast(private val mContext: Context): View.OnLayoutChangeListener, Vi
         return this
     }
 
-    fun setColor(color: Int): PopupToast {
+    fun setThemeColor(color: Int): PopupToast {
         mView?.findViewById<View>(R.id.left_view)?.setBackgroundColor(color)
-        mView?.findViewById<TextView>(R.id.popup_text)?.setTextColor(color)
-        mView?.findViewById<ImageView>(R.id.image_view)?.setColorFilter(color)
         return this
     }
 
     fun setBgColor(color: Int): PopupToast {
         setViewDrawable(color)
+        return this
+    }
+
+    fun setIcon(resId: Int, color: Int = Color.WHITE): PopupToast {
+        mView?.findViewById<ImageView>(R.id.image_view)?.let {
+            it.setImageResource(resId)
+            it.setColorFilter(color)
+        }
         return this
     }
 
