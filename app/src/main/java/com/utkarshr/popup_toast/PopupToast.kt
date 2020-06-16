@@ -16,6 +16,7 @@ import android.view.animation.OvershootInterpolator
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.GestureDetectorCompat
 import java.lang.ref.WeakReference
@@ -44,27 +45,26 @@ class PopupToast(private val mContext: Context): View.OnLayoutChangeListener, Vi
             mGestureDetector = GestureDetectorCompat(mContext, FlingGestureListener(this))
             mRootViewGroup = activity.window.decorView.rootView.findViewById(android.R.id.content) as ViewGroup
             mHandler = ToastHandler(this)
-
-            createView(mContext)
         }
     }
 
     @SuppressLint("InflateParams")
-    private fun createView(context: Context) {
+    private fun createView() {
         if (mView != null) {
             return
         }
-        val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+        val inflater = mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         mView = inflater.inflate(R.layout.view_popup_toast, null)
 
+        setViewDrawable()
+    }
+
+    private fun setViewProperties() {
         //setting some initial position
         mView?.x = Utils.dpToPx(200).toFloat()
         mView?.y = Utils.dpToPx(200).toFloat()
-
         mView?.addOnLayoutChangeListener(this)
         mView?.setOnTouchListener(this)
-
-        setViewDrawable()
     }
 
     private fun addViewToSuperview() {
@@ -114,8 +114,8 @@ class PopupToast(private val mContext: Context): View.OnLayoutChangeListener, Vi
         }
     }
 
-    private fun getLayoutParams(): LinearLayout.LayoutParams {
-        val params = LinearLayout.LayoutParams(
+    private fun getLayoutParams(): ConstraintLayout.LayoutParams {
+        val params = ConstraintLayout.LayoutParams(
                 ViewGroup.LayoutParams.WRAP_CONTENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT
         )
@@ -209,6 +209,19 @@ class PopupToast(private val mContext: Context): View.OnLayoutChangeListener, Vi
         return !mGestureDetector.onTouchEvent(event)
     }
 
+    fun makeText(text: String, color: Int = Color.WHITE): PopupToast {
+        createView()
+        setViewProperties()
+        mView?.findViewById<TextView>(R.id.popup_text)?.let {
+            it.text = text
+            if (mToastStyle == null) {
+                it.setTextColor(color)
+            }
+
+        }
+        return this
+    }
+
     fun setStyle(style: ToastStyle): PopupToast {
         mToastStyle = style
         mView?.findViewById<ImageView>(R.id.image_view)?.visibility = View.VISIBLE
@@ -249,17 +262,6 @@ class PopupToast(private val mContext: Context): View.OnLayoutChangeListener, Vi
         return this
     }
 
-    fun setText(text: String, color: Int = Color.WHITE): PopupToast {
-        mView?.findViewById<TextView>(R.id.popup_text)?.let {
-            it.text = text
-            if (mToastStyle == null) {
-                it.setTextColor(color)
-            }
-
-        }
-        return this
-    }
-
     fun setDuration(duration: Int): PopupToast {
         mToastDuration = duration
         return this
@@ -281,6 +283,12 @@ class PopupToast(private val mContext: Context): View.OnLayoutChangeListener, Vi
             it.setImageResource(resId)
             it.setColorFilter(color)
         }
+        return this
+    }
+
+    fun setView(view: View): PopupToast {
+        mView = view
+        setViewProperties()
         return this
     }
 
