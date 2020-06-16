@@ -10,6 +10,7 @@ import android.media.Image
 import android.os.Build
 import android.os.Handler
 import android.os.Message
+import android.transition.Visibility
 import android.view.*
 import android.view.animation.OvershootInterpolator
 import android.widget.ImageView
@@ -32,7 +33,7 @@ class PopupToast(private val mContext: Context): View.OnLayoutChangeListener, Vi
     private var mViewY = 0f
     private var mYDelta = 0f
     private val mPaddingFromBottom = Utils.dpToPx(24).toFloat()
-    private var mToastDuration = 3000   //time in ms
+    private var mToastDuration = 5000   //time in ms
     private var mPostHoldDuration = 1000   //time in ms
     private var mToastStyle: ToastStyle? = null
 
@@ -210,6 +211,7 @@ class PopupToast(private val mContext: Context): View.OnLayoutChangeListener, Vi
 
     fun setStyle(style: ToastStyle): PopupToast {
         mToastStyle = style
+        mView?.findViewById<ImageView>(R.id.image_view)?.visibility = View.VISIBLE
         when (style) {
             ToastStyle.INFO -> {
                 val darkColor = ContextCompat.getColor(mContext, R.color.colorInfoDark)
@@ -275,6 +277,7 @@ class PopupToast(private val mContext: Context): View.OnLayoutChangeListener, Vi
 
     fun setIcon(resId: Int, color: Int = Color.WHITE): PopupToast {
         mView?.findViewById<ImageView>(R.id.image_view)?.let {
+            it.visibility = View.VISIBLE
             it.setImageResource(resId)
             it.setColorFilter(color)
         }

@@ -43,7 +43,7 @@ class MainActivity : AppCompatActivity() {
 
         findViewById<Button>(R.id.customStyleButton).setOnClickListener {
             PopupToast(this)
-                .setText("This is a custom style message", Color.MAGENTA)
+                .setText("This is a custom style message in two lines", Color.MAGENTA)
                 .setIcon(R.drawable.ic_success_white, Color.RED)
                 .setDuration(5000)
                 .setThemeColor(Color.GREEN)
@@ -53,8 +53,10 @@ class MainActivity : AppCompatActivity() {
 
         findViewById<Button>(R.id.customViewButton).setOnClickListener {
             PopupToast(this)
-                .setStyle(ToastStyle.INFO)
-                .setText("Toast moved to class new abc")
+                .setText("This is a custom style message in two lines", Color.GREEN)
+                .setDuration(6000)
+                .setThemeColor(Color.MAGENTA)
+                .setBgColor(Color.DKGRAY)
                 .show()
         }
 
