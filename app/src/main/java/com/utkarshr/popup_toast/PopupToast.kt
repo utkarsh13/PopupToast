@@ -6,15 +6,12 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
-import android.media.Image
 import android.os.Build
 import android.os.Handler
 import android.os.Message
-import android.transition.Visibility
 import android.view.*
 import android.view.animation.OvershootInterpolator
 import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
@@ -34,14 +31,14 @@ class PopupToast(private val mContext: Context): View.OnLayoutChangeListener, Vi
     private var mViewY = 0f
     private var mYDelta = 0f
     private val mPaddingFromBottom = Utils.dpToPx(24).toFloat()
-    private var mToastDuration = 5000   //time in ms
+    private var mToastDuration = 3000   //time in ms
     private var mPostHoldDuration = 1000   //time in ms
     private var mToastStyle: ToastStyle? = null
 
     init {
         val activityFromContext = Utils.getActivity(mContext)
 
-        activityFromContext?.let {activity ->
+        activityFromContext?.let { activity ->
             mGestureDetector = GestureDetectorCompat(mContext, FlingGestureListener(this))
             mRootViewGroup = activity.window.decorView.rootView.findViewById(android.R.id.content) as ViewGroup
             mHandler = ToastHandler(this)
@@ -61,8 +58,8 @@ class PopupToast(private val mContext: Context): View.OnLayoutChangeListener, Vi
 
     private fun setViewProperties() {
         //setting some initial position
-        mView?.x = Utils.dpToPx(200).toFloat()
-        mView?.y = Utils.dpToPx(200).toFloat()
+        mView?.x = 0F
+        mView?.y = 0F
         mView?.addOnLayoutChangeListener(this)
         mView?.setOnTouchListener(this)
     }
@@ -147,7 +144,7 @@ class PopupToast(private val mContext: Context): View.OnLayoutChangeListener, Vi
     }
 
     override fun onLayoutChange(
-        view: View?,
+        vw: View?,
         left: Int,
         top: Int,
         right: Int,
@@ -157,25 +154,27 @@ class PopupToast(private val mContext: Context): View.OnLayoutChangeListener, Vi
         oldRight: Int,
         oldBottom: Int
     ) {
-        view?.visibility = View.VISIBLE
-        val viewWidth = view?.width ?: 0
-        val viewHeight = view?.height ?: 0
-        val newX = (Utils.screenWidth - viewWidth) / 2
-        val startY = mRootViewGroup!!.height
-        val finalY = mRootViewGroup!!.height - viewHeight - mPaddingFromBottom
-        view?.x = newX.toFloat()
-        view?.y = startY.toFloat()
+        vw?.let { view ->
+            view.visibility = View.VISIBLE
+            val viewWidth = view.width ?: 0
+            val viewHeight = view.height ?: 0
+            val newX = (Utils.screenWidth - viewWidth) / 2
+            val startY = mRootViewGroup!!.height
+            val finalY = mRootViewGroup!!.height - viewHeight - mPaddingFromBottom
+            view.x = newX.toFloat()
+            view.y = startY.toFloat()
 
-        mViewY = finalY
+            mViewY = finalY
 
-        val anim = ObjectAnimator.ofFloat(view, "translationY", finalY)
-        anim.duration = 300
-        anim.interpolator = OvershootInterpolator(2f)
-        anim.start()
+            val anim = ObjectAnimator.ofFloat(view, "translationY", finalY)
+            anim.duration = 300
+            anim.interpolator = OvershootInterpolator(2f)
+            anim.start()
 
-        mHandler.sendEmptyMessageDelayed(ToastHandlerMessage.MSG_HIDE.value, mToastDuration.toLong())
+            mHandler.sendEmptyMessageDelayed(ToastHandlerMessage.MSG_HIDE.value, mToastDuration.toLong())
 
-        view?.removeOnLayoutChangeListener(this)
+            view.removeOnLayoutChangeListener(this)
+        }
     }
 
     @SuppressLint("ClickableViewAccessibility")

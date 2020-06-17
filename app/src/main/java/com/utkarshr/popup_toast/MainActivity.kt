@@ -1,5 +1,6 @@
 package com.utkarshr.popup_toast
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
@@ -55,6 +56,8 @@ class MainActivity : AppCompatActivity() {
 
         findViewById<Button>(R.id.customViewButton).setOnClickListener {
             val inflater = getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+
+            @SuppressLint("InflateParams")
             val view = inflater.inflate(R.layout.view_custom, null)
 
             PopupToast(this)
