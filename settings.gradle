@@ -1,3 +1,3 @@
-include ':PopupToast'
+include ':PopupToastLib'
 rootProject.name='Popup-Toast'
 include ':app'
