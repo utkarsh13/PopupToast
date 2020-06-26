@@ -1,2 +1,3 @@
+include ':PopupToast'
 rootProject.name='Popup-Toast'
 include ':app'
