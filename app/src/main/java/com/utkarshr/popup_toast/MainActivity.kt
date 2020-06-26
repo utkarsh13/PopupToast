@@ -7,6 +7,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
+import com.utkarshr.popuptoast.PopupToast
+import com.utkarshr.popuptoast.ToastStyle
 
 
 class MainActivity : AppCompatActivity() {
