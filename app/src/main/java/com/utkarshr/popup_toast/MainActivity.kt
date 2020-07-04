@@ -48,11 +48,11 @@ class MainActivity : AppCompatActivity() {
 
         findViewById<Button>(R.id.customStyleButton).setOnClickListener {
             PopupToast(this)
-                .makeText("This is a custom style message in two lines", Color.MAGENTA)
-                .setIcon(R.drawable.ic_success_white, Color.RED)
+                .makeText("This is a custom style message in two lines", Color.GREEN)
+                .setIcon(R.drawable.ic_success_white, Color.GREEN)
                 .setDuration(5000)
-                .setThemeColor(Color.GREEN)
-                .setBgColor(Color.BLACK)
+                .setThemeColor(Color.RED)
+                .setBgColor(Color.GRAY)
                 .show()
         }
 

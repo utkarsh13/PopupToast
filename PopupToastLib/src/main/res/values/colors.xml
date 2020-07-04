@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorWarningDark">#8A6D3B</color>
-    <color name="colorWarningLight">#FCF8E3</color>
-    <color name="colorErrorDark">#A94442</color>
-    <color name="colorErrorLight">#F2DEDE</color>
-    <color name="colorSuccessDark">#3C763D</color>
-    <color name="colorSuccessLight">#DFF0D8</color>
-    <color name="colorInfoDark">#31708F</color>
-    <color name="colorInfoLight">#D9EDF7</color>
+    <color name="colorWarningDark">#EE9C00</color>
+    <color name="colorWarningLight">#FDF5E6</color>
+    <color name="colorErrorDark">#FF063A</color>
+    <color name="colorErrorLight">#FFDFE6</color>
+    <color name="colorSuccessDark">#28A744</color>
+    <color name="colorSuccessLight">#E4F4E7</color>
+    <color name="colorInfoDark">#007BFF</color>
+    <color name="colorInfoLight">#EFF7FF</color>
 </resources>

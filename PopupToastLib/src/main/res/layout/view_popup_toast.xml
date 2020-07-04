@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:background="@color/colorAccent"
+    android:background="@color/colorSuccessLight"
     android:elevation="4dp"
     android:orientation="horizontal">
 
@@ -13,7 +13,7 @@
         android:layout_width="8dp"
         android:layout_height="match_parent"
         android:layout_marginEnd="10dp"
-        android:background="@color/colorPrimary" />
+        android:background="@color/colorSuccessLight" />
 
     <ImageView
         android:id="@+id/image_view"
@@ -35,6 +35,6 @@
         android:paddingTop="10dp"
         android:paddingBottom="10dp"
         android:textAlignment="center"
-        android:textSize="13sp"
+        android:textSize="14sp"
         tools:text="This is a textView" />
 </LinearLayout>
