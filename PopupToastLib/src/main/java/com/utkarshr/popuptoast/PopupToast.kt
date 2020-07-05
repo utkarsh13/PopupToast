@@ -113,7 +113,7 @@ class PopupToast(private val mContext: Context): View.OnLayoutChangeListener, Vi
 
     private fun getLayoutParams(): ConstraintLayout.LayoutParams {
         val params = ConstraintLayout.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT
         )
         params.marginStart = Utils.dpToPx(64)
