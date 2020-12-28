@@ -5,7 +5,7 @@
 
 Displays a toast similar to Reddit app
 
-<img src="https://user-images.githubusercontent.com/8288422/103168782-2d5a0f00-485c-11eb-9210-13035dbc8822.gif" height = "460">
+<img src="https://user-images.githubusercontent.com/8288422/103168782-2d5a0f00-485c-11eb-9210-13035dbc8822.gif" height = "459">
 
 
 <img src="https://user-images.githubusercontent.com/8288422/103168977-01d82400-485e-11eb-9322-fffc23e35a0e.png" height = "100"> <img src="https://user-images.githubusercontent.com/8288422/103168980-0ef51300-485e-11eb-8853-01528bda4b17.png" height = "100">
